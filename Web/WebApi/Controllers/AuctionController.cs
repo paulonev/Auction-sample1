@@ -49,17 +49,20 @@ namespace WebApi.Controllers
             var totalItems = await _auctionRepository.CountAsync(filterSpec, cancellationToken);
 
             var specPaged = new AuctionFilterPaginatedSpecification(
-                request.PageNumber * request.PageSize, 
+                request.PageIndex * request.PageSize, 
                 request.PageSize, 
                 request.CategoryId);
             
             var auctions = await _auctionRepository.ListAsync(specPaged, cancellationToken);
 
-            var response = new ListPagedAuctionResponse(request.CorrelationId());
-
+            var response = new ListPagedAuctionResponse(request.CorrelationId())
+            {
+                PageSize = request.PageSize,
+                PageCount = int.Parse(Math.Ceiling((decimal) totalItems / request.PageSize).ToString()),
+                PageIndex = request.PageIndex
+            };
             response.Auctions.AddRange(auctions.Select(_mapper.Map<AuctionDto>));
-            response.PageCount = int.Parse(Math.Ceiling((decimal)totalItems / request.PageSize).ToString());
-
+            
             return Ok(response);
         }
 

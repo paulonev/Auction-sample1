@@ -5,8 +5,8 @@ namespace WebApi.AuctionEndpoints
 {
     public class ListPagedAuctionRequest : BaseRequest
     {
-        public int PageNumber { get; set; }
-        public int PageSize { get; set; }
+        public int PageIndex { get; set; } = AppConstants.DEFAULT_PAGE_NUMBER;
+        public int PageSize { get; set; } = AppConstants.ITEMS_PER_PAGE;
         public Guid CategoryId { get; set; }
     }
 }

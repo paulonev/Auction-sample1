@@ -17,5 +17,8 @@ namespace WebApi.AuctionEndpoints
         
         public List<AuctionDto> Auctions { get; set; }
         public int PageCount { get; set; }
+        public int PageSize { get; set; }
+        public int PageIndex { get; set; }
+        public int ResponseItemsCount { get; set; }
     }
 }
