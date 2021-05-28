@@ -11,6 +11,7 @@ namespace Infrastructure.Data.ModelConfiguration
             builder.ToTable("Trades");
             
             builder.HasKey(t => t.Id);
+            
             builder.Property(t => t.BidId)
                 .IsRequired();
         }

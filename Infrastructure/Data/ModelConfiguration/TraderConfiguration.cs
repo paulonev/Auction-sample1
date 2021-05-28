@@ -10,12 +10,8 @@ namespace Infrastructure.Data.ModelConfiguration
         {
             builder.ToTable("Traders");
 
-            builder.HasKey(t => t.Id);
+            builder.HasKey(t => t.IdentityGuid);
             
-            builder.Property(t => t.NickName)
-                .IsRequired()
-                .HasMaxLength(50);
-
             builder.HasMany(t => t.CreatedSlots)
                 .WithOne(s => s.Owner)
                 .HasForeignKey(s => s.OwnerId) // or it can be set to TraderId by EF Core

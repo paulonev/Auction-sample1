@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using System.Reflection;
-using Infrastructure.Data.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
@@ -14,42 +13,52 @@ namespace Infrastructure.Data
 
         public AuctionDbContext CreateDbContext(string[] args)
         {
-            var basePath = Directory.GetCurrentDirectory() + "../../Web";
-            return Create(basePath, Environment.GetEnvironmentVariable(AspNetCoreEnvironment));            
+            var basePath = $"{Directory.GetCurrentDirectory()}../../Web/WebApi";
+            return Create(args[0], basePath, Environment.GetEnvironmentVariable(AspNetCoreEnvironment));            
         }
 
-        private AuctionDbContext Create(string basePath, string environmentName)
+        private AuctionDbContext Create(string dbTypeArgument, string basePath, string environmentName)
         {
             var configuration = new ConfigurationBuilder()
-                .SetBasePath(basePath)
+                .SetBasePath(basePath)    
                 .AddJsonFile("appsettings.json")
                 .AddJsonFile($"appsettings.{environmentName}.json", true)
                 // .AddUserSecrets(Assembly.GetExecutingAssembly())
                 .AddEnvironmentVariables()
                 .Build();
 
-            var connectionString = configuration.GetConnectionString("AuctionConnection");
-
-            return Create(connectionString);
+            string connectionString = "";
+            string connectionType = "";
+            if(dbTypeArgument.Contains("Dev"))
+            {
+                 connectionString = configuration.GetConnectionString("AuctionConnectionDev");
+                 connectionType = "local";
+            }
+            else
+            {
+                connectionString = configuration.GetConnectionString("AuctionConnection");
+                connectionType = "azure";
+            }
+            
+            return Create(connectionString, connectionType);
         }
         
-        private AuctionDbContext Create(string connectionString)
+        private AuctionDbContext Create(string connectionString, string type)
         {
-            // if (string.IsNullOrEmpty(connectionString))
-            // {
-            //     throw new ArgumentException($"Connection string '{connectionString}' is null or empty.",
-            //         nameof(connectionString));
-            // }
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new ArgumentException($"Connection string '{connectionString}' is null or empty.",
+                    nameof(connectionString));
+            }
 
-            // Console.WriteLine(
-            //     $"DesignTimeDbContextFactoryBase.Create(string): Connection string: '{connectionString}'.");
+            Console.WriteLine(
+                $"DesignTimeDbContextFactory.Create(string): Connection string: '{connectionString}'.");
 
             var optionsBuilder = new DbContextOptionsBuilder<AuctionDbContext>();
 
-            optionsBuilder.UseSqlServer(connectionString, builder =>
-            {
-                builder.EnableRetryOnFailure(5);
-            });
+            optionsBuilder = type == "local" ?
+                optionsBuilder.UseSqlite(connectionString) :
+                optionsBuilder.UseSqlServer(connectionString, builder => builder.EnableRetryOnFailure(5));
 
             return new AuctionDbContext(optionsBuilder.Options);
         }

@@ -9,8 +9,7 @@ namespace ApplicationCore.Entities
     public class Trader
     {
         // a reference guid to Asp.Net Core Identity entity
-        public Guid Id { get; set; }
-        public string NickName { get; set; }
+        public Guid IdentityGuid { get; set; }
         
         private readonly List<Bid> _bids = new List<Bid>();
         public IReadOnlyCollection<Bid> Bids => _bids.AsReadOnly();

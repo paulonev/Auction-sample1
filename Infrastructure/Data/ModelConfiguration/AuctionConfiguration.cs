@@ -10,6 +10,10 @@ namespace Infrastructure.Data.ModelConfiguration
         {
             builder.HasKey(a => a.Id);
 
+            builder.Property(a => a.Title)
+                .IsRequired()
+                .HasMaxLength(150);
+
             builder.Property(a => a.StartedOn)
                 .IsRequired()
                 .HasColumnType("datetime2(7)");
@@ -24,6 +28,7 @@ namespace Infrastructure.Data.ModelConfiguration
                 .IsRequired(false);
 
             builder.Ignore(a => a.Bids);
+            builder.Ignore(a => a.Categories);
         }
     }
 }

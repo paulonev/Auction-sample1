@@ -8,7 +8,7 @@ using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Data.DataAccess
+namespace Infrastructure.Data
 {
     public class EfRepository<TEntity> : IAsyncRepository<TEntity> where TEntity: class
     {

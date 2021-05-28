@@ -10,8 +10,6 @@ namespace ApplicationCore.Entities
 
         public string Name { get; set; }
 
-        public Slot Slot { get; set; }
-        
         public Guid? ParentCategoryId { get; set; }
         public Category ParentCategory { get; set; }
 
@@ -19,6 +17,8 @@ namespace ApplicationCore.Entities
         private readonly List<Category> _subCategories;
         public IReadOnlyCollection<Category> SubCategories => _subCategories.AsReadOnly();
 
+        public ICollection<Slot> Slots { get; set; }
+        
         public Category()
         { }
         

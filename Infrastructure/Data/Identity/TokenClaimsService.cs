@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ApplicationCore.Constants;
 using ApplicationCore.Interfaces;
+using Infrastructure.Data.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 

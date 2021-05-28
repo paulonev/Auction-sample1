@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using ApplicationCore.Constants;
 using ApplicationCore.Entities;
-using Infrastructure.Data.DataAccess;
+using Infrastructure.Data.Identity;
 using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,48 +17,70 @@ namespace Infrastructure.Data
     /// </summary>
     public class AuctionContextSeed
     {
-        public static async Task SeedIdentityAsync(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        private readonly AuctionDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        public AuctionContextSeed(
+            AuctionDbContext context, 
+            UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole> roleManager)
         {
-            await roleManager.CreateAsync(new IdentityRole("Administrator"));
+            _context = context;
+            _userManager = userManager;
+            _roleManager = roleManager;
+        }
+        
+        public async Task SeedIdentityAsync(ILoggerFactory logFactory)
+        {
+            var log = logFactory.CreateLogger<AuctionDbContext>();
+            log.Log(LogLevel.Information, "Seeding identity context to the database");
+            
+            await _roleManager.CreateAsync(new IdentityRole("Administrator")); // extract to app constant
             
             //create demo user
             var defaultUser = new ApplicationUser { UserName = "demouser", Email = "demouser@google.com" };
-            await userManager.CreateAsync(defaultUser, AuthorizationConstants.DEFAULT_PASSWORD);
+            await _userManager.CreateAsync(defaultUser, AuthorizationConstants.DEFAULT_PASSWORD);
 
             //create admin
-            string adminUserName = "admin007";
+            string adminUserName = "admin001";
             var adminUser = new ApplicationUser { UserName = adminUserName, Email = "admin@google.com" };
-            await userManager.CreateAsync(adminUser, AuthorizationConstants.DEFAULT_PASSWORD);
+            await _userManager.CreateAsync(adminUser, AuthorizationConstants.DEFAULT_PASSWORD);
             
-            adminUser = await userManager.FindByNameAsync(adminUserName);
-            await userManager.AddToRoleAsync(adminUser, "Administrator");
+            adminUser = await _userManager.FindByNameAsync(adminUserName);
+            await _userManager.AddToRoleAsync(adminUser, "Administrator");
         }
         
-        public static async Task SeedAuctionAsync(AuctionDbContext auctionContext, ILoggerFactory logFactory, int retryTime = 0)
+        public async Task SeedAuctionAsync(ILoggerFactory logFactory, int retryTime = 0)
         {
-            //Tables to seed: will have 2 slots, 1 auction, 6 bids, maybe 1 trade and 5 categories, 1 admin, 1 user
+            //Tables to seed: will have 2 slots, 1 auction, 6 bids
             try
             {
-                if (!await auctionContext.Categories.AnyAsync())
+                _context.Slots.RemoveRange(_context.Slots);
+                _context.Categories.RemoveRange(_context.Categories);
+                _context.Traders.RemoveRange(_context.Traders);
+                await _context.SaveChangesAsync();
+                
+                if (!await _context.Categories.AnyAsync())
                 {
-                    await auctionContext.Categories.AddRangeAsync(GetConfiguredCategories());
+                    await _context.Categories.AddRangeAsync(GetConfiguredCategories());
 
-                    await auctionContext.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
                 }
                 
-                if (!await auctionContext.Slots.AnyAsync())
+                if (!await _context.Traders.AnyAsync())
                 {
-                    await auctionContext.Slots.AddRangeAsync(GetConfiguredSlots());
-                
-                    await auctionContext.SaveChangesAsync();
-                }
+                    await _context.Traders.AddRangeAsync(GetConfiguredTraders());
 
-                // if (!await auctionContext.Bids.AnyAsync())
-                // {
-                //     await auctionContext.Bids.AddRangeAsync(GetConfiguredBids());f
-                //     
-                //     await auctionContext.SaveChangesAsync();
-                // }
+                    await _context.SaveChangesAsync();
+                }
+                
+                if (!await _context.Slots.AnyAsync())
+                {
+                    await _context.Slots.AddRangeAsync(GetConfiguredSlots());
+                
+                    await _context.SaveChangesAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -66,13 +89,25 @@ namespace Infrastructure.Data
                     retryTime++;
                     var log = logFactory.CreateLogger<AuctionDbContext>();
                     log.LogError(ex.Message);
-                    await SeedAuctionAsync(auctionContext, logFactory, retryTime);
+                    await SeedAuctionAsync(logFactory, retryTime);
                 }
                 throw;
             }
         }
 
-        static IEnumerable<Category> GetConfiguredCategories()
+        private IEnumerable<Trader> GetConfiguredTraders()
+        {
+            var traders = new List<Trader>();
+            foreach (var user in _context.Users)
+            {
+                var trader = new Trader() {IdentityGuid = Guid.Parse(user.Id)};
+                traders.Add(trader);
+            }
+
+            return traders;
+        }
+
+        private IEnumerable<Category> GetConfiguredCategories()
         {
             var c1Id = "76eb9a11-b63d-40d2-b256-7feca943275a";
             var c1 = new Category(new Guid(c1Id), "c1");
@@ -105,13 +140,41 @@ namespace Infrastructure.Data
             return categories;
         }
 
-        static IEnumerable<Slot> GetConfiguredSlots()
+        private IEnumerable<Slot> GetConfiguredSlots()
         {
-            var firstSlot = new Slot("T-Shirt V-neck", "For men 170cm tall", new Guid("76eb9a11-b63d-40d2-b256-7feca943275a"), Guid.NewGuid(), 15m, new List<Picture>() {new Picture() {Url = "https://cdn5.vectorstock.com/i/1000x1000/50/04/broken-glass-icon-vector-10905004.jpg"}});
-            var secondSlot = new Slot("T-Shirt S-neck", "For men 156cm tall", new Guid("76eb9a11-b63d-40d2-b256-7feca943275a"), Guid.NewGuid(), 10m, new List<Picture>() {new Picture() {Url = "https://cdn5.vectorstock.com/i/1000x1000/50/04/broken-glass-icon-vector-10905004.jpg"}});
-            var thirdSlot = new Slot("T-Shirt BlackStarWear", "For men 180cm tall", new Guid("76eb9a11-b63d-40d2-b256-7feca943275a"), Guid.NewGuid(), 35m, new List<Picture>() {new Picture() {Url = "https://cdn5.vectorstock.com/i/1000x1000/50/04/broken-glass-icon-vector-10905004.jpg"}});
-
-            return new List<Slot> {firstSlot, secondSlot, thirdSlot};
+            var slotOwnerId = Guid.Parse(_context.Users.First().Id);
+            var slotCategoryId = _context.Categories.First().Id;
+            
+            var firstSlot = new Slot(
+                "T-Shirt V-neck",
+                "For men 170cm tall",
+                slotCategoryId,
+                slotOwnerId,
+                null,
+                15m,
+                new List<Picture>() {new Picture() {Url = "https://cdn5.vectorstock.com/i/1000x1000/50/04/broken-glass-icon-vector-10905004.jpg"}}
+            );
+            var secondSlot = new Slot(
+                "T-Shirt S-neck",
+                "For men 156cm tall",
+                slotCategoryId,
+                slotOwnerId,
+                null,
+                15m,
+                new List<Picture>() {new Picture() {Url = "https://cdn5.vectorstock.com/i/1000x1000/50/04/broken-glass-icon-vector-10905004.jpg"}}
+            );
+            var thirdSlot = new Slot(
+                "T-Shirt BlackStarWear",
+                "For men 180cm tall",
+                slotCategoryId,
+                slotOwnerId,
+                null,
+                15m,
+                new List<Picture>() {new Picture() {Url = "https://cdn5.vectorstock.com/i/1000x1000/50/04/broken-glass-icon-vector-10905004.jpg"}}
+            );
+            
+            var allItems = new List<Slot> {firstSlot, secondSlot, thirdSlot};
+            return allItems;
         }
     }
 }

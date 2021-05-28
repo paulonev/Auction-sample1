@@ -8,6 +8,8 @@ namespace Infrastructure.Data.ModelConfiguration
     {
         public void Configure(EntityTypeBuilder<Category> builder)
         {
+            builder.ToTable("Categories");
+            
             builder.HasKey(c => c.Id);
 
             builder.Property(c => c.Name)
@@ -18,6 +20,11 @@ namespace Infrastructure.Data.ModelConfiguration
                 .WithMany(c => c.SubCategories)
                 .HasForeignKey(c => c.ParentCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasMany(c => c.Slots)
+                .WithOne(s => s.Category)
+                .HasForeignKey(s => s.CategoryId)
+                .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

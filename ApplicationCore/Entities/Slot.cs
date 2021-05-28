@@ -8,7 +8,7 @@ namespace ApplicationCore.Entities
     /// Domain entity of app
     /// Represents unit of trade
     /// </summary>
-    public class Slot : AuditableEntity
+    public class Slot
     {
         public Guid Id { get; set; }
         
@@ -17,6 +17,7 @@ namespace ApplicationCore.Entities
         public string Description { get; set; }
         
         public Guid CategoryId { get; set; }
+        public Category Category { get; set; }
         
         public Guid OwnerId { get; set; }
         
@@ -32,8 +33,7 @@ namespace ApplicationCore.Entities
         
         public List<Picture> Pictures { get; set; }
         
-        // private readonly List<Bid> _bids = new List<Bid>();
-        // public IReadOnlyCollection<Bid> Bids => _bids.AsReadOnly();
+        public IReadOnlyCollection<Bid> Bids { get; set; }
 
         public Slot()
         { }
@@ -43,6 +43,7 @@ namespace ApplicationCore.Entities
             string description,
             Guid categoryId,
             Guid ownerId,
+            Guid? auctionId,
             decimal startPrice,
             List<Picture> pictures)
         {
@@ -51,11 +52,12 @@ namespace ApplicationCore.Entities
             Description = description;
             CategoryId = categoryId;
             OwnerId = ownerId;
+            AuctionId = auctionId;
             StartPrice = startPrice;
             Status = SlotStatus.OnUserModification;
             Pictures = pictures ?? new List<Picture>();
         }
-
+        
         public void UpdateDetails(string title, string description, decimal price)
         {
             Title = title;

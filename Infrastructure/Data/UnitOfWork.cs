@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 
-namespace Infrastructure.Data.DataAccess
+namespace Infrastructure.Data
 {
     public class UnitOfWork
     {

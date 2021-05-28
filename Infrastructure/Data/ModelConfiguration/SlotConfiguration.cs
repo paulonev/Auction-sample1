@@ -12,21 +12,16 @@ namespace Infrastructure.Data.ModelConfiguration
 
             builder.Property(s => s.Title)
                 .IsRequired()
-                .HasMaxLength(50);
+                .HasMaxLength(150);
 
             builder.Property(s => s.Description)
                 .IsRequired()
                 .HasMaxLength(1024);
-
-            builder.Property(s => s.CategoryId)
-                .IsRequired();
-
+            
             builder.Property(s => s.StartPrice)
                 .IsRequired()
                 .HasColumnType("decimal(16,3)");
             
-            // builder.Property(s => s.AuctionId);
-
             builder.HasMany(s => s.Bids)
                 .WithOne(b => b.Slot)
                 .HasForeignKey(b => b.SlotId)
