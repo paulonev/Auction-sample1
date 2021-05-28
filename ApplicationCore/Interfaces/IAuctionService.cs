@@ -7,7 +7,7 @@ namespace ApplicationCore.Interfaces
 {
     public interface IAuctionService
     {
-        Task AddSlotToAuction(Slot slot);
+        Task AddSlotToAuction(Guid auctionId, Slot slot);
         Task<List<string>> GetDistinctCategoryNames(Guid auctionId);
     }
 }

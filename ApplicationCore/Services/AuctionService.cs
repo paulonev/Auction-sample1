@@ -21,10 +21,13 @@ namespace ApplicationCore.Services
         }
         
         // decide upon q
-        public Task AddSlotToAuction(Slot slot)
+        public async Task AddSlotToAuction(Guid auctionId, Slot slot)
         {
+            var auction = await _auctionRepository.GetByIdAsync(auctionId);
+            auction?.AddSlot(slot);
+            // throw exception if auction is null
         }
-        
+
         public async Task<List<string>> GetDistinctCategoryNames(Guid auctionId)
         {
             var categories = new HashSet<string>();
