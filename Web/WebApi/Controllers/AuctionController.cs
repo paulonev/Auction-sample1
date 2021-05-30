@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,8 +9,9 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebApi.AuctionEndpoints;
-using WebApi.Models;
 using WebApi.Specifications;
+using IAuctionService = WebApi.Interfaces.IAuctionService;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace WebApi.Controllers
 {
@@ -38,93 +40,158 @@ namespace WebApi.Controllers
             _mapper = mapper;
         }
         
-        // GET /auctions
-        [HttpGet("auctions")]
-        // add swagger description
+        [HttpGet]
+        [SwaggerOperation(
+            Summary = "Get list of auctions with specification",
+            Description = "Return paginated collection of auctions that meet specification",
+            OperationId = "auctions-list",
+            Tags = new[] {"AuctionEndpoints"})]
         public async Task<ActionResult<ListPagedAuctionResponse>> ListPaged([FromQuery] ListPagedAuctionRequest request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Call /api/auctions");
+            _logger.LogInformation("Call /api/Auction");
 
-            var filterSpec = new AuctionFilterSpecification(request.CategoryId);
-            var totalItems = await _auctionRepository.CountAsync(filterSpec, cancellationToken);
-
-            var specPaged = new AuctionFilterPaginatedSpecification(
-                request.PageIndex * request.PageSize, 
-                request.PageSize, 
-                request.CategoryId);
+            // var category = request.CategoryId.HasValue
+            //     ? await _categoryRepository.GetByIdAsync(request.CategoryId.Value, cancellationToken)
+            //     : null;
             
-            var auctions = await _auctionRepository.ListAsync(specPaged, cancellationToken);
+            // var filterSpec = new AuctionFilterSpecification(request.CategoryId);
+            // var totalItems = await _auctionRepository.CountAsync(filterSpec, cancellationToken);
+
+            var includeSpec = new AuctionIncludeSpecification();
+            
+            var auctions = await _auctionRepository.ListAsync(includeSpec, cancellationToken);
+            if (request.CategoryId.HasValue)
+            {
+                auctions = _auctionService.FilterAuctionsByCategory(auctions, request.CategoryId);
+            }
+            
+            var totalItems = auctions.Count;
+            auctions = auctions
+                .Skip((request.PageIndex - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToList();
+            
+            // var specPaged = new AuctionFilterPaginatedSpecification(
+            //     (request.PageIndex-1) * request.PageSize, 
+            //     request.PageSize    
+            // );
+
+            // var auctions = await _auctionRepository.ListAsync(specPaged, cancellationToken);
 
             var response = new ListPagedAuctionResponse(request.CorrelationId())
             {
                 PageSize = request.PageSize,
                 PageCount = int.Parse(Math.Ceiling((decimal) totalItems / request.PageSize).ToString()),
-                PageIndex = request.PageIndex
+                PageIndex = request.PageIndex,
+                Auctions = auctions.Select(a => _mapper.Map<Auction, AuctionDto>(a)).ToList(),
+                ResponseItemsCount = totalItems
             };
-            response.Auctions.AddRange(auctions.Select(_mapper.Map<AuctionDto>));
             
             return Ok(response);
         }
 
-        [HttpGet("auctions/{AuctionId}")]
+        [HttpGet("{AuctionId}")]
+        [SwaggerOperation(
+            Summary = "Get auction by identification",
+            Description = "Produce HTTPResponse of types: 200, 404",
+            OperationId = "auctions-GetById",
+            Tags = new[] {"AuctionEndpoints"})]
         public async Task<ActionResult<GetByIdAuctionResponse>> GetById([FromRoute] GetByIdAuctionRequest request,
             CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Call /api/auctions/{AuctionId}");
+            _logger.LogInformation($"Call /api/Auction/{request.AuctionId}");
 
-            var auction = await _auctionRepository.GetByIdAsync(request.AuctionId, cancellationToken);
-            if (auction == null)
+            var includeSpec = new AuctionIncludeSpecification(request.AuctionId);
+            var auctions = await _auctionRepository.ListAsync(includeSpec, cancellationToken);
+            if (auctions == null)
             {
                 return NotFound();
             }
-            
-            var response = new GetByIdAuctionResponse(request.CorrelationId());
-            response.Auction = new AuctionDto
+
+            var response = new GetByIdAuctionResponse(request.CorrelationId())
             {
-                Id = auction.Id,
-                Title = auction.Title,
-                EndedOn = auction.EndedOn,
-                CategoryNames = await _auctionService.GetDistinctCategoryNames(auction.Id),
-                AuctionSlotDtoItems = auction.Items.Select(_mapper.Map<AuctionSlotDto>).ToList()
+                Auction = _mapper.Map<Auction, AuctionDto>(auctions.First())
             };
 
             return Ok(response);
         }
 
-        [HttpPost("/auction-create")]
-        //add swagger description
-        public async Task<ActionResult<CreateAuctionResponse>> Create([FromForm] CreateAuctionRequest request,
-            CancellationToken cancellationToken)
+        [HttpPost]
+        [SwaggerOperation(
+            Summary = "Create new Auction",
+            Description = "Paste form-data to new Auction instance",
+            OperationId = "auctions-Create",
+            Tags = new[] {"AuctionEndpoints"})]
+        public async Task<ActionResult<CreateAuctionResponse>> Create([FromForm] CreateAuctionRequest request)
         {
-            _logger.LogInformation("Call /api/auction-create");
+            _logger.LogInformation("Call post on /api/Auction");
             
             var auctionModel = new Auction(request.Title, request.StartDate, request.EndDate);
-            foreach (var slotId in request.Slots)
-            {
-                var slot = await _slotRepository.GetByIdAsync(slotId);
-                auctionModel.AddSlot(slot);
-            }
+            await _auctionService.AddSlotsToAuction(auctionModel, request.Slots);
             
-            auctionModel = await _auctionRepository.AddAsync(auctionModel, cancellationToken);
+            await _auctionRepository.AddAsync(auctionModel, new CancellationToken(false));
             
             var response = new CreateAuctionResponse(request.CorrelationId());
-            response.Auction = new AuctionDto
-            {
-                Id = auctionModel.Id,
-                Title = auctionModel.Title,
-                EndedOn = auctionModel.EndedOn,
-                AuctionSlotDtoItems = auctionModel.Items.Select(_mapper.Map<AuctionSlotDto>).ToList(),
-                CategoryNames = await _auctionService.GetDistinctCategoryNames(auctionModel.Id)
-            };
+            response.Auction = _mapper.Map<Auction, AuctionDto>(auctionModel);
 
             return Ok(response);
         }
 
-        [HttpDelete("auctions/{AuctionId}")]
+        [HttpPut("{AuctionId}")]
+        [SwaggerOperation(
+            Summary = "Update Auction",
+            Description = "Update auction",
+            OperationId = "auctions-Update",
+            Tags = new[] {"AuctionEndpoints"})]
+        public async Task<ActionResult<UpdateAuctionResponse>> Update(UpdateAuctionRequest request,
+            CancellationToken cancellationToken)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Not a valid model");
+            }
+            
+            //1. find item
+            var auction = await _auctionRepository.GetByIdAsync(request.AuctionId, cancellationToken);
+            if(auction != null)
+            {
+                //2. call updates on model
+                auction.UpdateTitle(request.Title);
+                auction.UpdatePeriod(request.StartedOn, request.EndedOn);
+
+                var findSlots = request.Slots.Select(async s => await _slotRepository.GetByIdAsync(s, cancellationToken));
+                var newSlots = new List<Slot>();
+                foreach (var findSlot in findSlots)
+                {
+                    newSlots.Add(await findSlot);
+                }
+                auction.UpdateSlots(newSlots);
+                //3. modify database entity
+                await _auctionRepository.UpdateAsync(auction, cancellationToken);
+                //4. create response model
+                var response = new UpdateAuctionResponse(request.CorrelationId())
+                {
+                    Auction = _mapper.Map<Auction, AuctionDto>(auction)
+                };
+                //5. return response
+                return response;
+            }
+            else
+            {
+                return NotFound();
+            }
+        }
+        
+        [HttpDelete("{AuctionId}")]
+        [SwaggerOperation(
+            Summary = "Delete auction",
+            Description = "Use AuctionId to delete auction",
+            OperationId = "auctions-Delete",
+            Tags = new[] {"AuctionEndpoints"})]
         public async Task<ActionResult<DeleteAuctionResponse>> Delete([FromRoute] DeleteAuctionRequest request,
             CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Call delete on /auctions/{AuctionId}");
+            _logger.LogInformation($"Call delete on api/Auction/{request.AuctionId}");
 
             var auctionToDelete = await _auctionRepository.GetByIdAsync(request.AuctionId, cancellationToken);
             if (auctionToDelete == null)

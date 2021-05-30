@@ -12,19 +12,19 @@ namespace Infrastructure.Data
 {
     public class EfRepository<TEntity> : IAsyncRepository<TEntity> where TEntity: class
     {
-        protected AuctionDbContext DbContext;
-        protected DbSet<TEntity> DbSet;
+        protected readonly AuctionDbContext _dbContext;
+        protected readonly DbSet<TEntity> _dbSet;
 
         public EfRepository(AuctionDbContext dbContext)
         {
-            DbContext = dbContext;
-            DbSet = DbContext.Set<TEntity>();
+            _dbContext = dbContext;
+            _dbSet = _dbContext.Set<TEntity>();
         }
         
         public async Task<TEntity> AddAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
-            await DbSet.AddAsync(entity, cancellationToken);
-            await DbContext.SaveChangesAsync(cancellationToken);
+            await _dbSet.AddAsync(entity, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
             
             return entity;
         }
@@ -32,12 +32,12 @@ namespace Infrastructure.Data
         public async Task<TEntity> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var keys = new object[] {id};
-            return await DbSet.FindAsync(keys, cancellationToken);
+            return await _dbSet.FindAsync(keys, cancellationToken);
         }
-
+        
         public async Task<IReadOnlyList<TEntity>> ListAllAsync(CancellationToken cancellationToken = default)
         {
-            return await DbSet.ToListAsync(cancellationToken);
+            return await _dbSet.ToListAsync(cancellationToken);
         }
 
         public async Task<IReadOnlyList<TEntity>> ListAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
@@ -46,16 +46,16 @@ namespace Infrastructure.Data
             return await specificationResult.ToListAsync(cancellationToken);
         }
 
-        public Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public async Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
-            DbContext.Entry(entity).State = EntityState.Modified;
-            return Task.CompletedTask;
+            _dbContext.Entry(entity).State = EntityState.Modified;
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
+        public async Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
         {
-            DbSet.Remove(entity);
-            return Task.CompletedTask;
+            _dbSet.Remove(entity);
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<int> CountAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
@@ -64,20 +64,22 @@ namespace Infrastructure.Data
             return await specificationResult.CountAsync(cancellationToken);
         }
 
-        public Task<TEntity> FirstAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
+        public async Task<TEntity> FirstAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var specificationResult = ApplySpecification(spec);
+            return await specificationResult.FirstAsync(cancellationToken);
         }
 
-        public Task<TEntity> FirstOrDefaultAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
+        public async Task<TEntity> FirstOrDefaultAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
         {
-            throw new NotImplementedException();
+            var specificationResult = ApplySpecification(spec);
+            return await specificationResult.FirstOrDefaultAsync(cancellationToken);
         }
         
-        private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec)
+        private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec, bool evaluateCriteriaOnly = false)
         {
             var evaluator = new SpecificationEvaluator();
-            return evaluator.GetQuery<TEntity>(DbContext.Set<TEntity>().AsQueryable(), spec, true);
+            return evaluator.GetQuery<TEntity>(_dbContext.Set<TEntity>().AsQueryable(), spec, evaluateCriteriaOnly);
         }
     }
 }

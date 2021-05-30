@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ApplicationCore.Exceptions;
+using ApplicationCore.Extensions;
 
 namespace ApplicationCore.Entities
 {
@@ -15,7 +16,7 @@ namespace ApplicationCore.Entities
         /// <summary>
         /// Items to be traded on an auction
         /// </summary>
-        private readonly List<Slot> _items;
+        private readonly List<Slot> _items = new List<Slot>();
         public IReadOnlyCollection<Slot> Items => _items.AsReadOnly();
 
         /// <summary>
@@ -31,7 +32,7 @@ namespace ApplicationCore.Entities
         public DateTime StartedOn { get; set; }
         public DateTime EndedOn { get; set; }
         
-        private readonly List<Category> _categories;
+        private readonly List<Category> _categories = new List<Category>();
         public IReadOnlyCollection<Category> Categories => _categories.AsReadOnly();
         
         public Auction()
@@ -43,7 +44,6 @@ namespace ApplicationCore.Entities
             Title = title;
             StartedOn = startedOn;
             EndedOn = endedOn;
-            _items = new List<Slot>();
         }
         
         // Auction Status property
@@ -70,10 +70,10 @@ namespace ApplicationCore.Entities
         /// </summary>
         /// <param name="categoryId"></param>
         /// <returns></returns>
-        public bool HasCategory(Guid categoryId)
+        public bool HasCategory(Category ca)
         {
-            var auctionCategories = _items.Select(s => s.CategoryId).Distinct();
-            return auctionCategories.Contains(categoryId);
+            // var auctionCategories = _items.Select(s => s.Category.Name).Distinct();
+            return _categories.Contains(ca);
         }
        
         public Bid FindWinningBid(Slot slot)
@@ -93,9 +93,50 @@ namespace ApplicationCore.Entities
 
             if (_items.All(s => s.Id != slot.Id))
             {
-                slot.Auction = this;
                 _items.Add(slot);
+                slot.Auction = this;
             }
+        }
+
+        public void UpdateTitle(string requestTitle)
+        {
+            Title = requestTitle ?? Title;
+        }
+
+        public void UpdatePeriod(in DateTime requestStartedOn, in DateTime requestEndedOn)
+        {
+            // TODO: refactor
+            if (requestStartedOn.IsEarlierThan(DateTime.Now))
+                throw new AuctionDateTimeException("Wrong time specification");
+            if (requestEndedOn.IsEarlierThan(DateTime.Now))
+                throw new AuctionDateTimeException("Wrong time specification");
+            if (requestEndedOn.IsEarlierThan(requestStartedOn))
+                throw new AuctionDateTimeException("Wrong time specification");
+            
+            if (DateTime.Compare(StartedOn, requestStartedOn) != 0)
+            {
+                StartedOn = requestStartedOn;
+            }
+            if (DateTime.Compare(EndedOn, requestEndedOn) != 0)
+            {
+                EndedOn = requestEndedOn;
+            }
+        }
+
+        public void UpdateSlots(IEnumerable<Slot> requestSlots)
+        {
+            foreach (var slot in requestSlots)
+            {
+                AddSlot(slot);
+            }
+        }
+    }
+    
+    //TODO: move to Exceptions/
+    public class AuctionDateTimeException : Exception
+    {
+        public AuctionDateTimeException(string message) : base(message)
+        {
         }
     }
 }

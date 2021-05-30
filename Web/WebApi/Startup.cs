@@ -1,27 +1,25 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Infrastructure;
-using Infrastructure.Identity;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using WebApi.Configuration;
+using AutoMapper;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 
 namespace WebApi
 {
     public class Startup
     {
+        private readonly ILogger<Startup> _logger;
+        
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            _logger = new LoggerFactory().CreateLogger<Startup>();
         }
 
         public IConfiguration Configuration { get; }
@@ -30,11 +28,14 @@ namespace WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddPersistence(Configuration);
-            
+            services.AddCoreServices(Configuration);
+            services.AddWebServices(Configuration);
+            services.AddAutoMapper(typeof(Startup).Assembly);
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "WebApi", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "AuctionWebApi", Version = "v1" });
+                c.EnableAnnotations();
             });
         }
 
@@ -43,9 +44,13 @@ namespace WebApi
         {
             if (env.IsDevelopment())
             {
+                _logger.LogInformation("Having dev environment");
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "WebApi v1"));
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "AuctionWebApi v1");
+                });
             }
 
             app.UseHttpsRedirection();
