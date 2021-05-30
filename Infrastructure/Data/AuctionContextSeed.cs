@@ -56,9 +56,9 @@ namespace Infrastructure.Data
             //Tables to seed: will have 2 slots, 1 auction, 6 bids
             try
             {
-                _context.Slots.RemoveRange(_context.Slots);
-                _context.Categories.RemoveRange(_context.Categories);
-                _context.Traders.RemoveRange(_context.Traders);
+                // _context.Slots.RemoveRange(_context.Slots);
+                // _context.Categories.RemoveRange(_context.Categories);
+                // _context.Traders.RemoveRange(_context.Traders);
                 await _context.SaveChangesAsync();
                 
                 if (!await _context.Categories.AnyAsync())

@@ -8,6 +8,9 @@ namespace Infrastructure.Data.ModelConfiguration
     {
         public void Configure(EntityTypeBuilder<Auction> builder)
         {
+            var navigation = builder.Metadata.FindNavigation(nameof(Auction.Items));
+            navigation.SetPropertyAccessMode(PropertyAccessMode.Field);
+            
             builder.HasKey(a => a.Id);
 
             builder.Property(a => a.Title)
@@ -25,6 +28,7 @@ namespace Infrastructure.Data.ModelConfiguration
             builder.HasMany(a => a.Items)
                 .WithOne(s => s.Auction)
                 .HasForeignKey(s => s.AuctionId)
+                .OnDelete(DeleteBehavior.SetNull)
                 .IsRequired(false);
 
             builder.Ignore(a => a.Bids);
