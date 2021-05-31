@@ -151,8 +151,7 @@ namespace Infrastructure.Data
                 slotCategoryId,
                 slotOwnerId,
                 null,
-                15m,
-                new List<Picture>() {new Picture() {Url = "https://cdn5.vectorstock.com/i/1000x1000/50/04/broken-glass-icon-vector-10905004.jpg"}}
+                15m
             );
             var secondSlot = new Slot(
                 "T-Shirt S-neck",
@@ -160,8 +159,7 @@ namespace Infrastructure.Data
                 slotCategoryId,
                 slotOwnerId,
                 null,
-                15m,
-                new List<Picture>() {new Picture() {Url = "https://cdn5.vectorstock.com/i/1000x1000/50/04/broken-glass-icon-vector-10905004.jpg"}}
+                15m
             );
             var thirdSlot = new Slot(
                 "T-Shirt BlackStarWear",
@@ -169,8 +167,7 @@ namespace Infrastructure.Data
                 slotCategoryId,
                 slotOwnerId,
                 null,
-                15m,
-                new List<Picture>() {new Picture() {Url = "https://cdn5.vectorstock.com/i/1000x1000/50/04/broken-glass-icon-vector-10905004.jpg"}}
+                15m
             );
             
             var allItems = new List<Slot> {firstSlot, secondSlot, thirdSlot};

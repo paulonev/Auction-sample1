@@ -29,6 +29,12 @@ namespace Infrastructure.Data
             return entity;
         }
 
+        public async Task AddRangeAsync(IEnumerable<TEntity> entities, bool saveChanges, CancellationToken cancellationToken = default)
+        {
+            await _dbSet.AddRangeAsync(entities, cancellationToken);
+            if(saveChanges) await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
         public async Task<TEntity> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
         {
             var keys = new object[] {id};

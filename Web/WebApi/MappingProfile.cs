@@ -1,7 +1,8 @@
-using System.Threading.Tasks;
 using ApplicationCore.Entities;
 using AutoMapper;
-using WebApi.AuctionEndpoints;
+using WebApi.ApiEndpoints.AuctionEndpoints;
+using WebApi.ApiEndpoints.Common;
+using WebApi.ApiEndpoints.SlotEndpoints;
 using WebApi.Interfaces;
 
 namespace WebApi
@@ -14,7 +15,9 @@ namespace WebApi
                 .AfterMap<SetCategoryNamesForAuction>()
                 .ForMember(dest => dest.AuctionSlotDtoItems, opt => opt.MapFrom(src => src.Items));
             CreateMap<Slot, AuctionSlotDto>();
-            CreateMap<Picture, PictureDto>();
+            CreateMap<Slot, SlotDto>();
+            CreateMap<Picture, PictureDto>()
+                .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.PictureUri));
         }
     }
 

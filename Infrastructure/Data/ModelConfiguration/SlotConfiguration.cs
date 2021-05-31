@@ -30,7 +30,8 @@ namespace Infrastructure.Data.ModelConfiguration
             builder
                 .HasMany(b => b.Pictures)
                 .WithOne(i => i.Item)
-                .HasForeignKey(i => i.ItemId);
+                .HasForeignKey(i => i.ItemId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

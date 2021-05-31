@@ -31,6 +31,7 @@ namespace WebApi
             services.AddCoreServices(Configuration);
             services.AddWebServices(Configuration);
             services.AddAutoMapper(typeof(Startup).Assembly);
+            services.AddCloudinary(Configuration);
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {

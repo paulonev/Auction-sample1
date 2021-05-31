@@ -10,11 +10,15 @@ namespace Infrastructure.Data.ModelConfiguration
         {
             builder.HasKey(p => p.Id);
 
-            builder.Property(p => p.Url)
+            builder.Property(p => p.PictureUri)
                 .IsRequired();
 
-            // builder.Property(p => p.ItemId)
-            //     .IsRequired();
+            builder.Property(p => p.Name)
+                .HasMaxLength(150)
+                .IsRequired();
+            
+            builder.Property(p => p.ItemId)
+                .IsRequired();
         }
     }
 }

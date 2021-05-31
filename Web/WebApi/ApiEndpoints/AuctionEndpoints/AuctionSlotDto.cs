@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using WebApi.ApiEndpoints.Common;
 
 namespace WebApi.ApiEndpoints.AuctionEndpoints
 {

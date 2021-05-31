@@ -45,7 +45,7 @@ namespace ApplicationCore.Entities
             Guid ownerId,
             Guid? auctionId,
             decimal startPrice,
-            List<Picture> pictures)
+            List<Picture> pictures = null)
         {
             Id = Guid.NewGuid();
             Title = title;
@@ -64,10 +64,19 @@ namespace ApplicationCore.Entities
             Description = description;
             StartPrice = price;
         }
-        
-        public void UploadPicture(Picture pic)
+
+        public void AddPictureRange(IEnumerable<Picture> pictures)
         {
-            Pictures.Add(pic);
+            foreach (var picture in pictures)
+            {
+                AddPicture(picture);
+            }
+        }
+        
+        public void AddPicture(Picture picture)
+        {
+            picture.ItemId = Id;
+            Pictures.Add(picture);
         }
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace WebApi.ApiEndpoints.AuctionEndpoints
+namespace WebApi.ApiEndpoints.Common
 {
     public class PictureDto
     {
