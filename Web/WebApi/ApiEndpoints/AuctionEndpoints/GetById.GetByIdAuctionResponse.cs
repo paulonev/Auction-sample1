@@ -1,7 +1,7 @@
 using System;
 using WebApi.Common;
 
-namespace WebApi.AuctionEndpoints
+namespace WebApi.ApiEndpoints.AuctionEndpoints
 {
     public class GetByIdAuctionResponse : BaseResponse
     {

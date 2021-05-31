@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace WebApi.AuctionEndpoints
+namespace WebApi.ApiEndpoints.AuctionEndpoints
 {
     public class AuctionSlotDto
     {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using WebApi.Common;
 
-namespace WebApi.AuctionEndpoints
+namespace WebApi.ApiEndpoints.AuctionEndpoints
 {
     public class UpdateAuctionRequest : BaseRequest
     {

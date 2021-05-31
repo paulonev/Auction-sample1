@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using ApplicationCore.Entities;
 using WebApi.Common;
 
-namespace WebApi.AuctionEndpoints
+namespace WebApi.ApiEndpoints.AuctionEndpoints
 {
     public class ListPagedAuctionResponse : BaseResponse
     {

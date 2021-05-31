@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using WebApi.Common;
 
-namespace WebApi.AuctionEndpoints
+namespace WebApi.ApiEndpoints.AuctionEndpoints
 {
     public class CreateAuctionRequest : BaseRequest
     {
