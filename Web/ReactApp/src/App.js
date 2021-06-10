@@ -16,18 +16,12 @@ function App() {
         <Route exact path={["/", "/home"]} component={Catalog} />
         <Route exact path={"/auction/:categoryId?"} component={Catalog} />
         <Route path={"/auction/details/:auctionId"} component={AuctionDetails} />
-        <Route
-          path={"/login"}
-          render={() => {
-            return <Login />;
-          }}
-        />
-        <Route
-          path={"/register"}
-          render={() => {
-            return <Signup />;
-          }}
-        />
+        <Route path={"/login"}>
+          <Login />
+        </Route>
+        <Route path={"/register"}>
+          <Signup />
+        </Route>
       </Switch>
     </Fragment>
   );

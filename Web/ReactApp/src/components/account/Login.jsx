@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import React, { useEffect, useRef, useState } from 'react';
-import { Alert, Button, Form, FormGroup, Card, Container } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Alert, Card, Container } from 'react-bootstrap';
 import { Link, useHistory, useLocation } from 'react-router-dom';
 import { useAuth0 } from '../../react-hooks/useAuth0';
 import { useForm } from 'react-hook-form';
@@ -28,11 +28,14 @@ export const Login = () => {
 
     async function onSubmit(data, e) {
         e.preventDefault();
-        loginWithRedirect(data).then(() => {
-            history.replace(from);
-        }).catch((error) => {
-            console.log("Login", error);
-        });
+
+        loginWithRedirect(data)
+            .then(() => {
+                history.replace(from);
+            })
+            .catch((error) => {
+                console.log("Login", error);
+            });
 
         // .then(() => {
         //redirect user to where it came from
