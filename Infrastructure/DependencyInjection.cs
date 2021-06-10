@@ -1,5 +1,7 @@
 using Infrastructure.Data;
 using Infrastructure.Data.Identity;
+using Infrastructure.Data.Interfaces;
+using Infrastructure.Data.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -30,7 +32,7 @@ namespace Infrastructure
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
                 {
                     options.Password.RequireDigit = false;
-                    options.Password.RequireLowercase = false;
+                    options.Password.RequireUppercase = false;
                     options.Password.RequireNonAlphanumeric = false;
                     options.SignIn.RequireConfirmedEmail = true;
                     options.Lockout.MaxFailedAccessAttempts = 5;
@@ -39,6 +41,7 @@ namespace Infrastructure
                 .AddDefaultTokenProviders();
 
             services.AddScoped<IAuctionDbContext>(provider => provider.GetService<AuctionDbContext>());
+            services.AddScoped<ITraderManager, TraderManager>();
             return services;
         }
     }

@@ -21,5 +21,8 @@ namespace ApplicationCore.Interfaces
 
         Task<TEntity> FirstAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default);
         Task<TEntity> FirstOrDefaultAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default);
+        
+        Task<TEntity> LastAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default);
+        Task<TEntity> LastOfDefaultAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default);
     }
 }

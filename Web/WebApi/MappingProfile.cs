@@ -1,6 +1,10 @@
+using System.Linq;
 using ApplicationCore.Entities;
 using AutoMapper;
+using Infrastructure.Data;
 using WebApi.ApiEndpoints.AuctionEndpoints;
+using WebApi.ApiEndpoints.BidEndpoints;
+using WebApi.ApiEndpoints.CategoryEndpoints;
 using WebApi.ApiEndpoints.Common;
 using WebApi.ApiEndpoints.SlotEndpoints;
 using WebApi.Interfaces;
@@ -18,6 +22,13 @@ namespace WebApi
             CreateMap<Slot, SlotDto>();
             CreateMap<Picture, PictureDto>()
                 .ForMember(dest => dest.Url, opt => opt.MapFrom(src => src.PictureUri));
+            CreateMap<Category, CategoryDto>();
+            CreateMap<Bid, BidDto>()
+                .AfterMap<SetTraderName>();
+            CreateMap<CreateBidRequest, Bid>()
+                .ForMember(dest => dest.Date,
+                    opt => opt.MapFrom(src => src.Date.ToUniversalTime()));
+
         }
     }
 
@@ -35,4 +46,22 @@ namespace WebApi
             destination.CategoryNames = _auctionService.GetDistinctCategoryNames(source);
         }
     }
+    
+    public class SetTraderName : IMappingAction<Bid, BidDto>
+    {
+        private readonly AuctionDbContext _dbContext;
+
+        public SetTraderName(AuctionDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
+
+        public void Process(Bid source, BidDto destination, ResolutionContext context)
+        {
+            destination.TraderName = _dbContext.Users
+                .Where(u => u.Id == source.TraderId.ToString())
+                .Select(u => u.UserName).First();
+        }
+    }
+
 }

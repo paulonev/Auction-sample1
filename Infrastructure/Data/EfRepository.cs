@@ -82,6 +82,18 @@ namespace Infrastructure.Data
             return await specificationResult.FirstOrDefaultAsync(cancellationToken);
         }
         
+        public async Task<TEntity> LastAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
+        {
+            var specificationResult = ApplySpecification(spec);
+            return await specificationResult.LastAsync(cancellationToken);
+        }
+
+        public async Task<TEntity> LastOfDefaultAsync(ISpecification<TEntity> spec, CancellationToken cancellationToken = default)
+        {
+            var specificationResult = ApplySpecification(spec);
+            return await specificationResult.LastOrDefaultAsync(cancellationToken);
+        }
+        
         private IQueryable<TEntity> ApplySpecification(ISpecification<TEntity> spec, bool evaluateCriteriaOnly = false)
         {
             var evaluator = new SpecificationEvaluator();

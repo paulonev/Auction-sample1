@@ -9,6 +9,9 @@ using Microsoft.OpenApi.Models;
 using WebApi.Configuration;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
+using Microsoft.IdentityModel.Tokens;
+using WebApi.Extensions;
+using WebApi.Middleware;
 
 namespace WebApi
 {
@@ -31,8 +34,22 @@ namespace WebApi
             services.AddCoreServices(Configuration);
             services.AddWebServices(Configuration);
             services.AddAutoMapper(typeof(Startup).Assembly);
+            //add authentication & authorization
+            services.AddJwtAuthentication(services.BindJwtSettings(Configuration));
             services.AddCloudinary(Configuration);
             services.AddControllers();
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000", "https://localhost:3000",
+                            "http://localhost:3001", "https://localhost:3001");
+                        builder.AllowCredentials();
+                        builder.AllowAnyMethod();
+                        builder.AllowAnyHeader();
+                    });
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "AuctionWebApi", Version = "v1" });
@@ -58,8 +75,14 @@ namespace WebApi
 
             app.UseRouting();
 
+            app.UseAuthorizationHeader();
+            
+            app.UseAuthentication();
+            
             app.UseAuthorization();
 
+            app.UseCors();
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

@@ -8,36 +8,35 @@ using ApplicationCore.Interfaces;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using WebApi.AuctionEndpoints;
 using WebApi.Specifications;
 using IAuctionService = WebApi.Interfaces.IAuctionService;
 using Swashbuckle.AspNetCore.Annotations;
+using WebApi.ApiEndpoints.AuctionEndpoints;
+using WebApi.Common;
 
 namespace WebApi.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    // use abstract BaseController for such route with IAsyncRepository
-    public class AuctionController : ControllerBase
+    // used abstract BaseController for such route with IAsyncRepository
+    public class AuctionController : BaseController
     {
         private readonly IAsyncRepository<Auction> _auctionRepository;
         private readonly IAsyncRepository<Slot> _slotRepository;
         private readonly IAuctionService _auctionService;
         private readonly ILogger<Auction> _logger;
-        private readonly IMapper _mapper;
+        // private readonly IMapper _mapper;
 
         public AuctionController(
             IAsyncRepository<Auction> auctionRepository,
             IAsyncRepository<Slot> slotRepository,
             IAuctionService auctionService,
             ILogger<Auction> logger,
-            IMapper mapper)
+            IMapper mapper) : base(mapper)
         {
             _auctionRepository = auctionRepository;
             _slotRepository = slotRepository;
             _auctionService = auctionService;
             _logger = logger;
-            _mapper = mapper;
+            // _mapper = mapper;
         }
         
         [HttpGet]
@@ -53,17 +52,13 @@ namespace WebApi.Controllers
             // var category = request.CategoryId.HasValue
             //     ? await _categoryRepository.GetByIdAsync(request.CategoryId.Value, cancellationToken)
             //     : null;
-            
             // var filterSpec = new AuctionFilterSpecification(request.CategoryId);
             // var totalItems = await _auctionRepository.CountAsync(filterSpec, cancellationToken);
 
             var includeSpec = new AuctionIncludeSpecification();
-            
             var auctions = await _auctionRepository.ListAsync(includeSpec, cancellationToken);
-            if (request.CategoryId.HasValue)
-            {
-                auctions = _auctionService.FilterAuctionsByCategory(auctions, request.CategoryId);
-            }
+            
+            auctions = _auctionService.FilterAuctions(auctions, request.Title, request.StartTime, request.EndTime, request.CategoryId);
             
             var totalItems = auctions.Count;
             auctions = auctions
@@ -75,7 +70,6 @@ namespace WebApi.Controllers
             //     (request.PageIndex-1) * request.PageSize, 
             //     request.PageSize    
             // );
-
             // var auctions = await _auctionRepository.ListAsync(specPaged, cancellationToken);
 
             var response = new ListPagedAuctionResponse(request.CorrelationId())
@@ -83,7 +77,7 @@ namespace WebApi.Controllers
                 PageSize = request.PageSize,
                 PageCount = int.Parse(Math.Ceiling((decimal) totalItems / request.PageSize).ToString()),
                 PageIndex = request.PageIndex,
-                Auctions = auctions.Select(a => _mapper.Map<Auction, AuctionDto>(a)).ToList(),
+                Auctions = auctions.Select(a => Mapper.Map<Auction, AuctionDto>(a)).ToList(),
                 ResponseItemsCount = totalItems
             };
             
@@ -110,7 +104,7 @@ namespace WebApi.Controllers
 
             var response = new GetByIdAuctionResponse(request.CorrelationId())
             {
-                Auction = _mapper.Map<Auction, AuctionDto>(auctions.First())
+                Auction = Mapper.Map<Auction, AuctionDto>(auctions.First())
             };
 
             return Ok(response);
@@ -132,7 +126,7 @@ namespace WebApi.Controllers
             await _auctionRepository.AddAsync(auctionModel, new CancellationToken(false));
             
             var response = new CreateAuctionResponse(request.CorrelationId());
-            response.Auction = _mapper.Map<Auction, AuctionDto>(auctionModel);
+            response.Auction = Mapper.Map<Auction, AuctionDto>(auctionModel);
 
             return Ok(response);
         }
@@ -171,7 +165,7 @@ namespace WebApi.Controllers
                 //4. create response model
                 var response = new UpdateAuctionResponse(request.CorrelationId())
                 {
-                    Auction = _mapper.Map<Auction, AuctionDto>(auction)
+                    Auction = Mapper.Map<Auction, AuctionDto>(auction)
                 };
                 //5. return response
                 return response;
