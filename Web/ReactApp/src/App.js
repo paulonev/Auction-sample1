@@ -1,18 +1,34 @@
-import { Component, Fragment, Container } from "react";
-import { Router, Route, Switch } from "react-router-dom";
-import { Catalog } from "./components/auctions/Catalog";
-import { AppNavigation } from "./components/nav/AppNavigation";
-import { ProvideAuth } from "./utils/authLib";
+import React, { useState } from "react";
+import { Fragment } from "react";
+import { Route, Switch } from "react-router-dom";
+import { Catalog } from "./components/auctions/Catalog/Catalog";
+import { AppNavigation } from "./components/navigation/AppNavigation";
+import { AuctionDetails } from "./components/auctions/Details/AuctionDetails"
+import { Login } from "./components/account/Login";
+import { Signup } from "./components/account/Signup";
 
 function App() {
+
   return (
     <Fragment>
-      {/* <ProvideAuth> */}
       <AppNavigation />
       <Switch>
-        <Route exact path={["/", "/auctions"]} component={Catalog} />
+        <Route exact path={["/", "/home"]} component={Catalog} />
+        <Route exact path={"/auction/:categoryId?"} component={Catalog} />
+        <Route path={"/auction/details/:auctionId"} component={AuctionDetails} />
+        <Route
+          path={"/login"}
+          render={() => {
+            return <Login />;
+          }}
+        />
+        <Route
+          path={"/register"}
+          render={() => {
+            return <Signup />;
+          }}
+        />
       </Switch>
-      {/* </ProvideAuth> */}
     </Fragment>
   );
 }

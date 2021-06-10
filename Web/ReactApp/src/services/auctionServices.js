@@ -1,23 +1,29 @@
-function getAllAuctions() {
-  //use api
-  const params = {
-    pageSize: 15, //change for constant
-    urlEndpoint: "/auctions"
-  }
-  const defaultPath = "https://localhost:5001";
-  const api = {axios: true, get: (path, body) => {}, post: (path, body) => {}};
+import api from "../utils/apiLib";
 
-  let prom = new Promise(api.get(defaultPath + params.urlEndpoint, {params}));
-  return prom.then((response) => {
-    return {
-      response,
-      data: []
-    }
-  });
+const getAuctions = (query) => {
+  return api
+    .get("/auction", { params: query })
+    .then((response) => {
+      return {
+        ...response,
+        auctions: response.data.auctions,
+        data: response.data
+      };
+    });
 }
 
-function getAuctionById(id) {
-  //use api
+const getAuctionById = (id) => {
+  console.log("Sending api request");
+  return api
+    .get(`/auction/${id}`)
+    .then((response) => {
+      return {
+        ...response,
+        data: {
+          ...response.data,
+        }
+      };
+    });
 }
 
 function createAuction(data) {
@@ -40,6 +46,7 @@ function getTopRankedAuctions() {
   //use api
 }
 
-export {
-  getAllAuctions
+export default {
+  getAuctions,
+  getAuctionById
 };

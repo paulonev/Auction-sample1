@@ -22,40 +22,8 @@ body {
   color: $red-style;
 }
 
-.header__links {
-  
-}
-
-.header__link {
-  font-size: 1.3rem !important;
-  color: #fff !important;
-}
-
-.header__link:hover {
-  color: $red-style !important;
-  text-decoration: underline $red-style;
-}
-
-.header__account {
-  width: 150px;
-  justify-content: space-around;
-  cursor: pointer;
-}
-
-.account-link {
-  
-}
-
-.account-link__login {
-
-}
-
-.account-link__register {
-
-}
-
 .catalog {
-  width: 75.78%; 
+  width: 66.67%; 
   margin: 0 auto;
 }
 
