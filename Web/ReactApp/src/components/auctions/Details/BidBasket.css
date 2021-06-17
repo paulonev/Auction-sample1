@@ -1,0 +1,15 @@
+.auction-details__bid {
+  display: flex;
+  align-items: flex-end;
+}
+
+.trader-name {
+  font-style: italic;
+  font-size: 16px;
+  color: #fff;
+  text-align: left;
+}
+
+.message {
+  padding: 10px 30px !important;
+}

@@ -1,0 +1,9 @@
+.login-form__item {
+  padding: 10px 0;
+}
+
+.login-form__button {
+  background-color: #007bff;
+  border: none;
+  color: #fff;
+}

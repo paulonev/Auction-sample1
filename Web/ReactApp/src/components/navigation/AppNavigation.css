@@ -1,0 +1,13 @@
+.header {
+  background-color: #FCB0A6;
+}
+
+.header__link {
+  margin-left: 15px;
+  font-size: 1.3rem !important;
+}
+
+.header__link:hover {
+  color: #ea2727 !important;
+  text-decoration: underline #ea2727;
+}
