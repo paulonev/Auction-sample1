@@ -11,28 +11,11 @@ export const AuctionList = ({
     error,
 }) => {
     const dateParser = (date) => {
-        //parse 2021-06-03T00:00:00 to 03/06/21 at 00:00:00
         let d = new Date(date);
         const minutes = d.getUTCMinutes() < 10 ? '0'+d.getUTCMinutes() : d.getUTCMinutes();
         return `${d.getUTCDate()}/${d.getUTCMonth()+1} at ${d.getUTCHours()}:${minutes}`;
     }
-
-    // pagination
-    // const observer = useRef();
-    // const lastItemElementRef = useCallback(
-    //     (node) => {
-    //         if (loading) return;
-    //         if (observer.current) observer.current.disconnect();
-    //         observer.current = new IntersectionObserver((entries) => {
-    //             if (entries[0].isIntersecting && hasMore) {
-    //                 setPageNumber((prevPageNumber) => prevPageNumber + 1);
-    //             }
-    //         });
-    //         if (node) observer.current.observe(node);
-    //     },
-    //     [loading, hasMore, setPageNumber]
-    // );
-    
+   
     const history = useHistory();
     
     return (

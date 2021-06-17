@@ -37,11 +37,7 @@ export const Signup = () => {
 
     setLoading(false);
   }
-
-  // useEffect(() => {
-  //   setAccountControlDisabled(true);
-  // }, [setAccountControlDisabled]);
-
+  
   useEffect(() => {
     if (errors && errors.length != 0) {
       setHasValidationErrors(true);

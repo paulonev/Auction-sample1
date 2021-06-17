@@ -1,7 +1,6 @@
 using System.Reflection;
 using ApplicationCore.Entities;
 using Infrastructure.Data.Identity;
-using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,10 +27,6 @@ namespace Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-            
-            // modelBuilder.Entity<ApplicationUser>()
-            //     .Property(au => au.TraderId)
-            //     .IsRequired();
         }
     }
 }

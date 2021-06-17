@@ -40,19 +40,6 @@ export const SearchFilter = ({ loading, query, setQuery}) => {
     })
   }
   
-  // const handleUseDateChange = () => {
-  //   setDateDisabled(!dateDisabled);
-  //   if (!dateDisabled) {
-  //     console.log("Query before", query);
-  //     setQuery((prev) => ({
-  //       ...prev,
-  //       startTime: null,
-  //       endTime: null,
-  //     }));
-  //     console.log("Query after", query);
-  //   }
-  // }
-  
   return (
     <Col className="auction__filters" lg={4} sm={4}>
       <div>

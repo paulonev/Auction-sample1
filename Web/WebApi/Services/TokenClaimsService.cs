@@ -34,6 +34,7 @@ namespace WebApi.Services
             var claims = new List<Claim> { new Claim(ClaimTypes.Name, userName) };
             
             var tokenHandler = new JwtSecurityTokenHandler();
+            // TODO: apply config from appsettings
             var secretKey = Encoding.ASCII.GetBytes(AuthorizationConstants.JWT_SECRET_KEY);
             
             foreach(var role in roles)

@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using ApplicationCore.Constants;
 using ApplicationCore.Entities;
 using Infrastructure.Data.Identity;
-using Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;

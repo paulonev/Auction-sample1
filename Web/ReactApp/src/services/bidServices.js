@@ -39,7 +39,7 @@ const getHighestBid = (query) => {
       return {
         ...response,
         data: {
-          ...response.data, //bid {id: aslkj3i4904, amount: 444, traderName: "test@test1.com"}
+          ...response.data,
         }
       };
     });

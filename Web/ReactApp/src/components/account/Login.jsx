@@ -5,10 +5,6 @@ import { Link, useHistory, useLocation } from 'react-router-dom';
 import { useAuth0 } from '../../react-hooks/useAuth0';
 import { useForm } from 'react-hook-form';
 
-// import { yupResolver } from '@hookform/resolvers/yup';
-// import * as yup from "yup";
-// import { history } from '../../index';
-
 import { ErrorMessage } from '@hookform/error-message';
 import "./Login.css";
 
@@ -36,20 +32,6 @@ export const Login = () => {
             .catch((error) => {
                 console.log("Login", error);
             });
-
-        // .then(() => {
-        //redirect user to where it came from
-        // if (error) {
-        //     return;
-        // }
-        // history.go(-1);
-        // console.log(history.location.state);
-        // history.location.state
-        //     ? history.replace(history.location.state)
-        //     : history.push("/");
-        // } catch (error) {
-        //     setError(error);
-        // }
     }
 
     useEffect(() => {
@@ -120,40 +102,3 @@ export const Login = () => {
 
     )
 }
-
-{/* <Form onSubmit={handleSubmit(onSubmit)}>
-                                <FormGroup controlId="formEmailInput">
-                                    <Form.Label>Email</Form.Label>
-                                    <Form.Control
-                                        {...register("email", {
-                                            required: "Email required",
-                                            pattern: {
-                                                value: /^\S+@\S+$/,
-                                                message: "Please enter valid email address",
-                                            }
-                                        })}
-                                        type="email"
-                                    />
-                                    <ErrorMessage errors={errors} name="email" as="p" />
-                                </FormGroup>
-                                <FormGroup controlId="formPasswordInput">
-                                    <Form.Label>Password</Form.Label>
-                                    <Form.Control
-                                        {...register("password", {
-                                            required: "Password required",
-                                            minLength: {
-                                                value: 6,
-                                                message: "Invalid password. Few characters."
-                                            },
-                                            maxLength: {
-                                                value: 50,
-                                                message: "Invalid password. Too much characters."
-                                            }
-                                        })}
-                                        type="password"
-                                    />
-                                    <ErrorMessage errors={errors} name="password" as="p" />
-
-                                </FormGroup>
-                                <Button className="w-100" variant="primary">Log In</Button>
-                            </Form> */}

@@ -5,8 +5,6 @@ import React, { useEffect } from "react";
 import { Badge, Spinner } from "react-bootstrap";
 import { PartialOutput } from "./PartialOutput";
 
-// import "./BidBasket.css";
-
 export const BidBasket = ({ bids, disabled, loading }) => {
   return (
     <>

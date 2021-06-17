@@ -1,4 +1,4 @@
-namespace Infrastructure.Identity.Models
+namespace Infrastructure.Data.Identity.Models
 {
     public class ClaimValue
     {

@@ -134,6 +134,7 @@ const SlotCard = ({ auctionId, slot, auctionFinished }) => {
 
 }
 
+// uncomment to turn on react why-did-you-render helper
 // SlotCard.whyDidYouRender = true;
 
 export default SlotList;

@@ -74,6 +74,7 @@ namespace WebApi.Controllers
             CancellationToken cancellationToken)
         {
             var bid = new Bid(request.TraderId, request.SlotId, request.Amount, request.Date);
+            // append layer in infrastructure for bidding (generate idea)
             await _bidRepository.AddAsync(bid, cancellationToken);
             
             var bidsSpecification = new BidSpecification(request.SlotId);

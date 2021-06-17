@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -6,7 +5,7 @@ using ApplicationCore.Entities;
 
 namespace ApplicationCore.Interfaces
 {
-    public interface IAuctionRepository : IAsyncRepository<Auction>
+    public interface IAuctionRepository
     {
         Task AddSlotAsync(Slot slot);
 

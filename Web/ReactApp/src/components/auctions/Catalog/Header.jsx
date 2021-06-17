@@ -10,21 +10,6 @@ export const Header = ({ totalItemsCount }) => {
         <h4>All Auctions</h4>
         <p>Auctions count: {totalItemsCount}</p>
       </div>
-      {/* <div className="generic-header-toolbar" role="toolbar">
-        <Dropdown>
-          <Dropdown.Toggle
-            className="sort-btn"
-            variant="light"
-            id="dropdown-basic"
-          >
-            Sort by
-          </Dropdown.Toggle>
-
-          <Dropdown.Menu>
-            <Dropdown.Item href="#/action-1">TODO</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
-      </div> */}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 using ApplicationCore.Interfaces;
-using ApplicationCore.Services;
+// using ApplicationCore.Services;
 using Infrastructure.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +11,7 @@ namespace WebApi.Configuration
         public static IServiceCollection AddCoreServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped(typeof(IAsyncRepository<>), typeof(EfRepository<>));
-            services.AddScoped<IAuctionCoreService, AuctionCoreService>();
+            // services.AddScoped<IAuctionCoreService, AuctionCoreService>();
             return services;
         }
     }
