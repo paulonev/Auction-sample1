@@ -23,7 +23,6 @@ namespace WebApi.Controllers
         private readonly IAsyncRepository<Slot> _slotRepository;
         private readonly IAuctionService _auctionService;
         private readonly ILogger<Auction> _logger;
-        // private readonly IMapper _mapper;
 
         public AuctionController(
             IAsyncRepository<Auction> auctionRepository,
@@ -36,7 +35,6 @@ namespace WebApi.Controllers
             _slotRepository = slotRepository;
             _auctionService = auctionService;
             _logger = logger;
-            // _mapper = mapper;
         }
         
         [HttpGet]
@@ -110,7 +108,7 @@ namespace WebApi.Controllers
             return Ok(response);
         }
 
-        [HttpPost]
+        [HttpPost("/create")]
         [SwaggerOperation(
             Summary = "Create new Auction",
             Description = "Paste form-data to new Auction instance",
@@ -118,16 +116,16 @@ namespace WebApi.Controllers
             Tags = new[] {"AuctionEndpoints"})]
         public async Task<ActionResult<CreateAuctionResponse>> Create([FromForm] CreateAuctionRequest request)
         {
-            _logger.LogInformation("Call post on /api/Auction");
+            _logger.LogInformation("Call post on /api/Auction to create auction");
             
-            var auctionModel = new Auction(request.Title, request.StartDate, request.EndDate);
+            var auctionModel = new Auction(request.Title, request.Description, request.StartTime, request.EndTime);
             await _auctionService.AddSlotsToAuction(auctionModel, request.Slots);
             
             await _auctionRepository.AddAsync(auctionModel, new CancellationToken(false));
             
             var response = new CreateAuctionResponse(request.CorrelationId());
-            response.Auction = Mapper.Map<Auction, AuctionDto>(auctionModel);
-
+            // response.Auction = Mapper.Map<Auction, AuctionDto>(auctionModel);
+            response.AuctionId = auctionModel.Id;
             return Ok(response);
         }
 

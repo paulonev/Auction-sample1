@@ -13,6 +13,6 @@ namespace WebApi.ApiEndpoints.AuctionEndpoints
         {
         }
 
-        public AuctionDto Auction { get; set; }
+        public Guid AuctionId { get; set; }
     }
 }

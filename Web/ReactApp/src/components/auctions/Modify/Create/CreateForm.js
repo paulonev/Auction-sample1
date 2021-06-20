@@ -8,6 +8,7 @@ import { useTimer } from '../../../../react-hooks/useTimer';
 import { useFormik } from 'formik';
 import { useAuth0 } from '../../../../react-hooks/useAuth0';
 import { SlotPicker } from './SlotPicker';
+import auctionServices from '../../../../services/auctionServices';
 
 export const CreateForm = () => {
     // const { register, handleSubmit, errors } = useForm();
@@ -17,29 +18,25 @@ export const CreateForm = () => {
     const { user } = useAuth0();
     // storage of slots indexes
     const [slots, setSlots] = useState({}); // {slotId: true/false}
+    const [slotsLoading, setSlotsLoading] = useState(true);
 
-    const onSubmit = (values, e) => {
+    const onSubmit = async (values, e) => {
         // e.preventDefault();
         var formData = new FormData(e.target);
         formData.append("startTime", startDateTime.toISOString("dd/mm/yyyy HH:mm"));
         formData.append("endTime", endDateTime.toISOString("dd/mm/yyyy HH:mm"));
-        formData.append("slots", []);
-        Object.getOwnPropertyNames(slots).forEach((value) => {
-            if(slots[value]) {
-                formData.append("slots", value);
-            }
-        })
         formData.append("title", values.title);
         formData.append("description", values.desc);
 
-        console.log(formData.get("startTime"));
-        console.log(formData.get("endTime"));
-        console.log(formData.get("slots"));
-        console.log(formData.get("title"));
-        console.log(formData.get("description"));
+        let slotsSelected = [];
+        Object.getOwnPropertyNames(slots).forEach((value) => {
+            if(slots[value]) {
+                slotsSelected.push(value);
+            }
+        });
+        formData.append("slots", slotsSelected);
         
-        // console.log(formData);
-        // if(slots) console.log(slots);
+        await auctionServices.createAuction(formData);
     };
 
     const formik = useFormik({
@@ -99,11 +96,11 @@ export const CreateForm = () => {
                         </Form.Group>
                     </Row>
 
-                    <SlotPicker userId={user.id} setSlotsAdded={setSlots} />
+                    <SlotPicker userId={user.id} setSlotsAdded={setSlots} slotsLoading={slotsLoading} setSlotsLoading={setSlotsLoading}/>
 
                     <Form.Group controlId="formButtons">
-                        <button className="button-group_button button-submit" type="submit" name="submit">Submit</button>
-                        <button className="button-group_button button-reset" type="reset" name="submit">Reset</button>
+                        <button disabled={slotsLoading} className="button-group_button button-submit" type="submit" name="submit">Submit</button>
+                        <button className="button-group_button button-reset" type="reset" name="reset">Reset</button>
                         <button className="button-group_button button-cancel" name="submit" onClick={() => { }}>Cancel</button>
                     </Form.Group>
                 </Form>

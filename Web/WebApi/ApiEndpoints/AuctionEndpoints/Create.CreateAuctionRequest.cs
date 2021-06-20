@@ -9,12 +9,11 @@ namespace WebApi.ApiEndpoints.AuctionEndpoints
     public class CreateAuctionRequest : BaseRequest
     {
         public string Title { get; set; }
+        public string Description { get; set; }
         
-        [JsonConverter(typeof(DateTimeConverter), new object[] { "MM-dd-yyyy", "yyyyMMddHHmmss" })]        
-        public DateTime StartDate { get; set; }
+        public DateTime StartTime { get; set; }
         
-        [JsonConverter(typeof(DateTimeConverter), new object[] { "MM-dd-yyyy", "yyyyMMddHHmmss" })]        
-        public DateTime EndDate { get; set; }
+        public DateTime EndTime { get; set; }
         
         public List<Guid> Slots { get; set; }
     }

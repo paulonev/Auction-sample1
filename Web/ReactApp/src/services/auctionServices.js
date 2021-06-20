@@ -26,8 +26,13 @@ const getAuctionById = (id) => {
     });
 }
 
-function createAuction(data) {
-  //use api
+function createAuction(query) {
+  console.log("Create auction query", query);
+  return api
+    .post("/create", query)
+    .then((response) => {
+      console.log(response.data.auctionId);
+    });
 }
 
 function editAuction(data) {
@@ -48,5 +53,6 @@ function getTopRankedAuctions() {
 
 export default {
   getAuctions,
-  getAuctionById
+  getAuctionById,
+  createAuction
 };

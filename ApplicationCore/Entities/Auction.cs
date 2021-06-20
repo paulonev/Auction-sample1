@@ -10,8 +10,9 @@ namespace ApplicationCore.Entities
     {
         public Guid Id { get; set; }
         
-        // modify model
         public string Title { get; set; }
+
+        public string Description { get; set; }
         
         /// <summary>
         /// Items to be traded on an auction
@@ -38,32 +39,17 @@ namespace ApplicationCore.Entities
         public Auction()
         { }
         
-        public Auction(string title, DateTime startedOn, DateTime endedOn)
+        public Auction(string title, string desc, DateTime startedOn, DateTime endedOn)
         {
             Id = Guid.NewGuid();
             Title = title;
+            Description = desc;
             StartedOn = startedOn;
             EndedOn = endedOn;
         }
         
         // Auction Status property
         
-        // public void CloseAuction()
-        // {
-        //     foreach (var item in _items)
-        //     {
-        //         var itemLastBid = _bids.LastOrDefault(b => b.SlotId == item.Id.ToString());
-        //         if (itemLastBid != null)
-        //         {
-        //             //create order
-        //         }
-        //         else
-        //         {
-        //             throw new Exception("Item not sold exception");           
-        //         }   
-        //     }
-        // }
-
         /// <summary>
         /// Identifies category for auction. Returns true for presence, false - for absence of category
         /// specified for auction
@@ -95,6 +81,7 @@ namespace ApplicationCore.Entities
             {
                 _items.Add(slot);
                 slot.Auction = this;
+                slot.AuctionId = this.Id;
             }
         }
 

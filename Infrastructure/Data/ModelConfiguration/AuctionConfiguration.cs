@@ -17,6 +17,10 @@ namespace Infrastructure.Data.ModelConfiguration
                 .IsRequired()
                 .HasMaxLength(150);
 
+            builder.Property(a => a.Description)
+                .IsRequired()
+                .HasMaxLength(500);
+
             builder.Property(a => a.StartedOn)
                 .IsRequired()
                 .HasColumnType("datetime2(7)");
@@ -31,8 +35,8 @@ namespace Infrastructure.Data.ModelConfiguration
                 .OnDelete(DeleteBehavior.SetNull)
                 .IsRequired(false);
 
-            builder.Ignore(a => a.Bids);
-            builder.Ignore(a => a.Categories);
+            builder.Ignore(a => a.Bids); //because bid depends on slot, not auction
+            builder.Ignore(a => a.Categories); //because category is independent of auction
         }
     }
 }

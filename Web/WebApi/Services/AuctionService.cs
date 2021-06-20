@@ -1,3 +1,4 @@
+using System.Threading;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +58,7 @@ namespace WebApi.Services
                 if (slot != null)
                 {
                     auction.AddSlot(slot);
+                    await _slotRepository.UpdateAsync(slot, new CancellationToken(false));
                 }
             }
         }
