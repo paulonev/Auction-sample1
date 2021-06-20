@@ -6,6 +6,8 @@ import { AppNavigation } from "./components/navigation/AppNavigation";
 import { AuctionDetails } from "./components/auctions/Details/AuctionDetails"
 import { Login } from "./components/account/Login";
 import { Signup } from "./components/account/Signup";
+import { PrivateRoute } from "./utils/components/privateRoute";
+import { CreateForm } from "./components/auctions/Modify/Create/CreateForm";
 
 function App() {
 
@@ -13,6 +15,7 @@ function App() {
     <Fragment>
       <AppNavigation />
       <Switch>
+        <PrivateRoute path={"/auction/create"} component={CreateForm} />
         <Route exact path={["/", "/home"]} component={Catalog} />
         <Route exact path={"/auction/:categoryId?"} component={Catalog} />
         <Route path={"/auction/details/:auctionId"} component={AuctionDetails} />

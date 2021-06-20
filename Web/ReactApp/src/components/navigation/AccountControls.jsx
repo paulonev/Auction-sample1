@@ -38,7 +38,7 @@ export const AccountControls = ({
                 {userName}
               </Dropdown.Toggle>
               <Dropdown.Menu>
-                <Dropdown.Item eventKey="1"> Create new auction</Dropdown.Item>
+                <Dropdown.Item eventKey="1" onClick={() => {history.push("auction/create")}}>Create new auction</Dropdown.Item>
                 <Dropdown.Divider />
                 <Dropdown.Item eventKey="2" as="button" onClick={() => { logout(); history.push("/") }}>Log out</Dropdown.Item>
               </Dropdown.Menu>

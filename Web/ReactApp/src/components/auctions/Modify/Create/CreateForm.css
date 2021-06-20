@@ -1,0 +1,45 @@
+.create-auction-form-wrapper {
+    border: .5px solid #d6d6d6;
+    border-radius: 10px; 
+    margin: auto;
+}
+
+.create-auction-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.form-input--wide {
+    width: 80%;
+}
+
+.col {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.slots-around {
+    display: flex;
+    justify-content: space-between;
+}
+
+.button-group_button {
+    margin-right: 20px;
+    padding: 5px 10px;
+    border-style: none;
+}
+
+.button-submit {
+    background-color: green;
+    color: white;
+}
+
+.button-reset {
+    background-color: yellow;
+}
+
+.button-cancel {
+    background-color: red;
+    color: white;
+}

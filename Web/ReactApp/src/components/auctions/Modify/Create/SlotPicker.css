@@ -1,0 +1,9 @@
+.slotpicker__controls {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button-view-slots {
+  background-color: #001edc;
+  color: #fff;
+}
